@@ -10,6 +10,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
 
@@ -36,7 +38,6 @@
         .app-container { width: 100%; max-width: 1300px; margin: 0 auto; min-height: 100vh; background: rgba(255,255,255,0.6); backdrop-filter: blur(20px); display: flex; flex-direction: column; border: 1px solid rgba(0,0,0,0.05); }
 
         #home-page { padding: 80px 25px; text-align: center; max-width: 450px; margin: 0 auto; }
-        .saarvain-tag { font-size: 11px; letter-spacing: 5px; color: #636e72; margin-bottom: 10px; font-weight: 600; }
         .app-title { font-size: 45px; font-weight: 900; margin-bottom: 50px; }
         .app-title span { color: var(--primary); }
         
@@ -148,7 +149,7 @@
             <span style="font-size: 24px; font-weight: 800;">₹49</span>
         </div>
         
-        <button class="add-btn" style="background: var(--primary); margin-bottom: 15px;" onclick="window.open('YOUR_COSMOFEED_LINK', '_blank')">PAY NOW</button>
+        <button class="add-btn" style="background: var(--primary); margin-bottom: 15px;" onclick="window.open('https://cosmofeed.com/vp/your-link', '_blank')">PAY NOW</button>
         
         <div style="border-top: 1px solid #eee; padding-top: 15px; margin-top: 10px;">
             <p style="font-size: 10px; font-weight: bold; margin-bottom: 8px;">ALREADY PAID? ENTER KEY:</p>
@@ -172,18 +173,17 @@
 </div>
 
 <script>
-    // 2. Firebase Configuration (Apna config yahan dalo)
-     const firebaseConfig = {
-  apiKey: "AIzaSyB-fZ2qA8aB_-Ra3I3WHa6RuoYFm-QabRY",
-  authDomain: "click-cha.firebaseapp.com",
-  databaseURL: "https://click-cha-default-rtdb.firebaseio.com",
-  projectId: "click-cha",
-  storageBucket: "click-cha.firebasestorage.app",
-  messagingSenderId: "231261928692",
-  appId: "1:231261928692:web:76e53480670c49b40932a1",
-  measurementId: "G-NZR6ZQQ1QZ"
-};
-    // Initialize Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyB-fZ2qA8aB_-Ra3I3WHa6RuoYFm-QabRY",
+        authDomain: "click-cha.firebaseapp.com",
+        databaseURL: "https://click-cha-default-rtdb.firebaseio.com",
+        projectId: "click-cha",
+        storageBucket: "click-cha.firebasestorage.app",
+        messagingSenderId: "231261928692",
+        appId: "1:231261928692:web:76e53480670c49b40932a1",
+        measurementId: "G-NZR6ZQQ1QZ"
+    };
+
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
@@ -209,34 +209,57 @@
         } else document.getElementById('payment-modal').style.display = 'flex';
     }
 
-    // 3. Updated checkActivationCode (Firebase se key verify karega)
+    // --- ACTIVATION LOGIC WITH FRONT-POPUP FIX ---
     async function checkActivationCode() {
         const inputKey = document.getElementById('activationCode').value.trim();
         const btn = document.getElementById('activate-btn');
 
-        if(!inputKey) return alert("Bhai, key toh dalo!");
+        if(!inputKey) {
+            Swal.fire({ 
+                icon: 'warning', 
+                title: 'Khali hai!', 
+                text: 'Bhai, key toh dalo pehle!', 
+                confirmButtonColor: '#6c5ce7',
+                didOpen: () => { Swal.getPopup().style.zIndex = '10000'; } // Modal ke upar lane ke liye
+            });
+            return;
+        }
 
         btn.innerText = "Checking...";
         btn.disabled = true;
 
         try {
-            // Firebase mein key dhoondo
             const snapshot = await db.ref('spendy_keys/' + inputKey).once('value');
             const status = snapshot.val();
 
             if (status === "USED") {
                 state.isPro = true; 
                 save(); 
-                alert("Success! Business Pro Unlocked. 👑"); 
-                closeModals(); 
-                triggerBizMode();
-            } else if (status === "VALID") {
-                alert("Ye key abhi tak use nahi hui hai. Pehle link se key generate karein.");
+                Swal.fire({ 
+                    title: 'CONGRATS!', 
+                    text: 'Business Pro Unlock ho gaya. 👑', 
+                    icon: 'success', 
+                    confirmButtonColor: '#6c5ce7',
+                    didOpen: () => { Swal.getPopup().style.zIndex = '10000'; }
+                })
+                .then(() => { closeModals(); triggerBizMode(); });
             } else {
-                alert("Invalid Key! Bhai, sahi code dalo.");
+                Swal.fire({ 
+                    icon: 'error', 
+                    title: 'WRONG CODE!', 
+                    text: 'DM ON INSTA FOR CODE.', 
+                    confirmButtonColor: '#eb4d4b',
+                    didOpen: () => { Swal.getPopup().style.zIndex = '10000'; }
+                });
             }
         } catch (error) {
-            alert("Connection Error! Firebase check karo.");
+            Swal.fire({ 
+                icon: 'question', 
+                title: 'Network Issue?', 
+                text: 'Internet check karo bhai.', 
+                confirmButtonColor: '#636e72',
+                didOpen: () => { Swal.getPopup().style.zIndex = '10000'; }
+            });
         } finally {
             btn.innerText = "Activate Pro";
             btn.disabled = false;
@@ -267,12 +290,20 @@
 
     function goHome() { document.getElementById('main-app').style.display = 'none'; document.getElementById('home-page').style.display = 'block'; }
     function setCat(c, el) { currentCat = c; document.querySelectorAll('.chip').forEach(ch => ch.classList.remove('selected')); el.classList.add('selected'); }
+    
     function addEntry() {
         const d = document.getElementById('desc').value, a = document.getElementById('amt').value;
         if(!d || !a) return;
         state[currentMode === 'personal' ? 'pData' : 'bData'].push({ d, a: parseFloat(a), cat: currentMode === 'business' ? currentCat : 'Personal', dt: new Date().toLocaleDateString('en-IN') });
-        document.getElementById('desc').value = ''; document.getElementById('amt').value = ''; save(); refresh();
+        document.getElementById('desc').value = ''; document.getElementById('amt').value = ''; 
+        save(); refresh();
+
+        Swal.fire({ 
+            toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, icon: 'success', title: 'Add ho gaya!',
+            didOpen: () => { Swal.getPopup().style.zIndex = '10000'; }
+        });
     }
+
     function saveBudget() { state.pBudget = parseFloat(document.getElementById('budgetInput').value) || 0; save(); refresh(); }
     function save() { localStorage.setItem('spendy_v7', JSON.stringify(state)); }
 
@@ -304,23 +335,11 @@
         let total = 0;
         const data = currentMode === 'personal' ? state.pData : state.bData;
         data.forEach(i => total += i.a);
-
         doc.setFontSize(14); doc.setTextColor(100); doc.text("SAARVAIN // SPENDY", 14, 15);
         doc.setFontSize(10); doc.text(`Date: ${new Date().toLocaleDateString('en-IN')}`, 14, 22);
-
-        if(currentMode === 'business') {
-            doc.setFontSize(14); doc.setTextColor(0); doc.text(`${state.bizName.toUpperCase()} (${state.bizBranch})`, 14, 32);
-        }
-
+        if(currentMode === 'business') doc.text(`${state.bizName.toUpperCase()} (${state.bizBranch})`, 14, 32);
         const rows = data.map(i => [i.dt, i.cat, i.d, `Rs. ${i.a.toLocaleString('en-IN')}`]);
-        doc.autoTable({
-            head: [['Date', 'Category', 'Description', 'Amount']], body: rows, startY: currentMode === 'business' ? 38 : 28,
-            theme: 'grid', headStyles: { fillColor: [0, 0, 0] }
-        });
-
-        const finalY = doc.lastAutoTable.finalY + 10;
-        doc.setFontSize(12); doc.setFont("helvetica", "bold");
-        doc.text(`TOTAL SPENT: Rs. ${total.toLocaleString('en-IN')}`, 14, finalY);
+        doc.autoTable({ head: [['Date', 'Category', 'Description', 'Amount']], body: rows, startY: currentMode === 'business' ? 38 : 28, theme: 'grid', headStyles: { fillColor: [0, 0, 0] } });
         doc.save(`Spendy_Report.pdf`);
     }
 </script>
