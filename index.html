@@ -4,16 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spendy | SAARVAIN</title>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+
     <style>
         :root {
             --primary: #6c5ce7;
-            --biz-panel: linear-gradient(135deg, #4b6cb7, #182848); /* Soft Premium Blue */
-            --pers-panel: linear-gradient(135deg, #667eea, #764ba2); /* Soft Purple */
+            --biz-panel: linear-gradient(135deg, #4b6cb7, #182848);
+            --pers-panel: linear-gradient(135deg, #667eea, #764ba2);
             --accent: #00cec9;
             --bg-light: #f8fafc;
             --text-dark: #2d3436;
@@ -144,12 +148,12 @@
             <span style="font-size: 24px; font-weight: 800;">₹49</span>
         </div>
         
-        <button class="add-btn" style="background: var(--primary); margin-bottom: 15px;" onclick="window.open('https://cosmofeed.com/vp/your-link', '_blank')">PAY NOW</button>
+        <button class="add-btn" style="background: var(--primary); margin-bottom: 15px;" onclick="window.open('YOUR_COSMOFEED_LINK', '_blank')">PAY NOW</button>
         
         <div style="border-top: 1px solid #eee; padding-top: 15px; margin-top: 10px;">
             <p style="font-size: 10px; font-weight: bold; margin-bottom: 8px;">ALREADY PAID? ENTER KEY:</p>
             <input type="text" id="activationCode" placeholder="Secret Key" style="text-align: center; border: 2px solid #edf2f7;">
-            <button class="add-btn" style="background: #000; padding: 12px;" onclick="checkActivationCode()">Activate Pro</button>
+            <button id="activate-btn" class="add-btn" style="background: #000; padding: 12px;" onclick="checkActivationCode()">Activate Pro</button>
         </div>
 
         <button onclick="closeModals()" style="background:none; border:none; color:#94a3b8; cursor:pointer; margin-top: 20px; font-size: 13px; font-weight: 600;">
@@ -168,6 +172,21 @@
 </div>
 
 <script>
+    // 2. Firebase Configuration (Apna config yahan dalo)
+     const firebaseConfig = {
+  apiKey: "AIzaSyB-fZ2qA8aB_-Ra3I3WHa6RuoYFm-QabRY",
+  authDomain: "click-cha.firebaseapp.com",
+  databaseURL: "https://click-cha-default-rtdb.firebaseio.com",
+  projectId: "click-cha",
+  storageBucket: "click-cha.firebasestorage.app",
+  messagingSenderId: "231261928692",
+  appId: "1:231261928692:web:76e53480670c49b40932a1",
+  measurementId: "G-NZR6ZQQ1QZ"
+};
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
     let state = JSON.parse(localStorage.getItem('spendy_v7')) || { 
         pData: [], bData: [], pBudget: 0, bizName: "", bizBranch: "", isPro: false 
     };
@@ -190,10 +209,38 @@
         } else document.getElementById('payment-modal').style.display = 'flex';
     }
 
-    function checkActivationCode() {
-        if(document.getElementById('activationCode').value.trim().toUpperCase() === "PRO49") {
-            state.isPro = true; save(); alert("Unlocked!"); closeModals(); triggerBizMode();
-        } else alert("Invalid Code!");
+    // 3. Updated checkActivationCode (Firebase se key verify karega)
+    async function checkActivationCode() {
+        const inputKey = document.getElementById('activationCode').value.trim();
+        const btn = document.getElementById('activate-btn');
+
+        if(!inputKey) return alert("Bhai, key toh dalo!");
+
+        btn.innerText = "Checking...";
+        btn.disabled = true;
+
+        try {
+            // Firebase mein key dhoondo
+            const snapshot = await db.ref('spendy_keys/' + inputKey).once('value');
+            const status = snapshot.val();
+
+            if (status === "USED") {
+                state.isPro = true; 
+                save(); 
+                alert("Success! Business Pro Unlocked. 👑"); 
+                closeModals(); 
+                triggerBizMode();
+            } else if (status === "VALID") {
+                alert("Ye key abhi tak use nahi hui hai. Pehle link se key generate karein.");
+            } else {
+                alert("Invalid Key! Bhai, sahi code dalo.");
+            }
+        } catch (error) {
+            alert("Connection Error! Firebase check karo.");
+        } finally {
+            btn.innerText = "Activate Pro";
+            btn.disabled = false;
+        }
     }
 
     function editBizProfile() { if(currentMode === 'business') document.getElementById('biz-info-modal').style.display = 'flex'; }
