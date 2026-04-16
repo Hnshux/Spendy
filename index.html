@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spendy | SAARVAIN</title>
+    <title>Spendy Pro | SAARVAIN</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
 
@@ -20,345 +18,346 @@
             --primary: #6c5ce7;
             --biz-panel: linear-gradient(135deg, #4b6cb7, #182848);
             --pers-panel: linear-gradient(135deg, #667eea, #764ba2);
-            --accent: #00cec9;
-            --bg-light: #f8fafc;
-            --text-dark: #2d3436;
+            --bg-light: #f4f7fe;
+            --text-dark: #1f2937;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg-light); color: var(--text-dark); min-height: 100vh; overflow-x: hidden; position: relative; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-light); color: var(--text-dark); overflow-x: hidden; position: relative; }
 
-        .bg-blob { position: fixed; border-radius: 50%; filter: blur(80px); z-index: -1; opacity: 0.3; animation: float 15s infinite alternate; }
-        .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: #a29bfe; }
-        .blob-2 { bottom: -10%; right: -10%; width: 600px; height: 600px; background: #81ecec; }
-        @keyframes float { from { transform: translate(0,0); } to { transform: translate(40px, 40px); } }
+        /* Smooth Animations */
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        #splash { position: fixed; inset: 0; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; color: #fff; transition: 0.5s; }
+        .bg-circle { position: fixed; border-radius: 50%; filter: blur(60px); opacity: 0.12; z-index: -1; transition: 0.5s; }
+        .c1 { top: 10%; left: 10%; width: 150px; height: 150px; background: var(--primary); }
+        .c2 { bottom: 15%; right: 5%; width: 200px; height: 200px; background: #4b6cb7; }
 
-        .app-container { width: 100%; max-width: 1300px; margin: 0 auto; min-height: 100vh; background: rgba(255,255,255,0.6); backdrop-filter: blur(20px); display: flex; flex-direction: column; border: 1px solid rgba(0,0,0,0.05); }
+        #splash { position: fixed; inset: 0; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; color: #fff; transition: 0.8s ease; }
 
-        #home-page { 
-            padding: 40px 25px; 
-            text-align: center; 
-            max-width: 450px; 
-            margin: 0 auto; 
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            min-height: 85vh; 
-        }
-        .app-title { font-size: 45px; font-weight: 900; margin-bottom: 40px; }
-        .app-title span { color: var(--primary); }
-        
-        .home-btn { width: 100%; padding: 22px; margin-bottom: 18px; border-radius: 24px; border: none; cursor: pointer; color: #fff; font-size: 17px; font-weight: 600; display: flex; align-items: center; justify-content: space-between; transition: 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
-        .home-btn:active { transform: scale(0.98); }
+        #side-menu { position: fixed; top: 0; left: -300px; width: 280px; height: 100%; background: #fff; z-index: 2000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 30px; border-right: 1px solid #e5e7eb; }
+        #side-menu.open { left: 0; }
+        #menu-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; z-index: 1500; backdrop-filter: blur(2px); animation: fadeIn 0.3s; }
 
-        .bottom-nav {
-            position: absolute;
-            bottom: 40px;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            opacity: 0.6;
-        }
-        .bottom-nav a { color: var(--text-dark); font-size: 22px; text-decoration: none; transition: 0.3s; }
-        .bottom-nav a:hover { color: var(--primary); transform: translateY(-3px); }
+        .app-container { width: 100%; max-width: 1300px; margin: 0 auto; min-height: 100vh; position: relative; }
 
-        #main-app { display: none; padding: 0 20px; }
-        .header-bar { display: flex; align-items: center; justify-content: space-between; padding: 25px 0; }
+        #home-page { padding: 40px 20px; text-align: center; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; animation: slideUp 0.6s ease; }
+        .mode-grid { display: grid; grid-template-columns: 1fr; gap: 25px; width: 100%; max-width: 800px; margin: 0 auto; padding: 20px 0; }
+        @media (min-width: 768px) { .mode-grid { grid-template-columns: 1fr 1fr; } }
+        .mode-card { padding: 45px; border-radius: 35px; border: none; cursor: pointer; color: #fff; text-align: left; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .mode-card:hover { transform: translateY(-10px) scale(1.02); }
 
-        .refresh-btn { background:none; border:none; color:var(--primary); font-size: 18px; cursor:pointer; transition: transform 0.4s; }
-        .refresh-btn:hover { transform: rotate(180deg); }
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; padding: 25px 20px; animation: fadeIn 0.5s; }
+        .panel { background: #fff; border-radius: 25px; padding: 30px; border: 1px solid #e5e7eb; margin-bottom: 25px; transition: 0.3s; }
+        .panel:hover { box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        .hero-card { border-radius: 35px; padding: 50px 20px; color: #fff; text-align: center; margin-bottom: 30px; box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
 
-        .dashboard-grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 30px; }
-        @media (min-width: 1024px) { .dashboard-grid { grid-template-columns: 350px 1fr 320px; } }
+        .chip-container { display: flex; gap: 12px; overflow-x: auto; margin-bottom: 25px; padding-bottom: 8px; scrollbar-width: none; }
+        .chip { padding: 12px 22px; background: #fff; border: 1px solid #eee; border-radius: 15px; cursor: pointer; font-size: 13px; font-weight: 700; white-space: nowrap; transition: 0.2s; }
+        .chip.selected { background: #111; color: #fff; border-color: #111; transform: scale(1.05); }
 
-        .panel { background: rgba(255,255,255,0.9); border-radius: 28px; padding: 25px; border: 1px solid #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
-        .hero-box { border-radius: 22px; padding: 35px 20px; color: #fff; text-align: center; margin-bottom: 20px; }
-        .hero-box h1 { font-size: 34px; font-weight: 800; }
+        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 18px; background: #fff; border-radius: 18px; margin-bottom: 12px; border: 1px solid #f3f4f6; animation: slideUp 0.4s ease; }
+        .del-btn { background: none; border: none; color: #ff7675; cursor: pointer; padding: 5px; font-size: 15px; opacity: 0.6; transition: 0.2s; }
+        .del-btn:hover { opacity: 1; transform: scale(1.2); }
 
-        input { width: 100%; padding: 15px; margin-bottom: 12px; border: 1px solid #edf2f7; border-radius: 15px; outline: none; background: #fff; font-size: 16px; }
-        .add-btn { width: 100%; padding: 16px; border: none; border-radius: 15px; font-weight: 700; cursor: pointer; color: #fff; }
+        .bottom-nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 420px; background: #111; border-radius: 30px; display: flex; justify-content: space-around; padding: 20px; z-index: 1000; box-shadow: 0 15px 35px rgba(0,0,0,0.3); animation: slideUp 0.8s ease; }
+        .nav-item { color: #555; font-size: 22px; cursor: pointer; transition: 0.3s; }
+        .nav-item.active { color: #fff; transform: translateY(-5px); }
 
-        .category-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
-        .chip { padding: 8px 16px; background: #f1f5f9; border-radius: 12px; font-size: 12px; cursor: pointer; white-space: nowrap; font-weight: 600; }
-        .chip.selected { background: var(--text-dark); color: #fff; }
-
-        .history-list { max-height: 550px; overflow-y: auto; }
-        .item-card { display: flex; justify-content: space-between; padding: 18px; background: #fff; border-radius: 20px; margin-bottom: 12px; border: 1px solid #f1f5f9; }
-        .item-info b { display: block; font-size: 16px; }
-        .item-info small { color: #94a3b8; font-size: 11px; display: block; margin-top: 4px; }
-        .item-price { color: #eb4d4b; font-weight: 800; font-size: 17px; }
+        input { width: 100%; padding: 18px; border: 1px solid #eee; border-radius: 18px; background: #fafafa; font-size: 16px; outline: none; margin-bottom: 15px; transition: 0.3s; }
+        input:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.1); }
+        .btn-main { width: 100%; padding: 18px; border: none; border-radius: 18px; font-weight: 800; cursor: pointer; color: #fff; background: var(--primary); transition: 0.3s; }
 
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; align-items: center; justify-content: center; z-index: 8000; backdrop-filter: blur(10px); }
-        .modal-content { background: #fff; width: 90%; max-width: 380px; padding: 35px; border-radius: 35px; text-align: center; }
+        .modal-content { background: #fff; width: 90%; max-width: 400px; padding: 40px; border-radius: 40px; text-align: center; animation: slideUp 0.4s; }
 
-        footer { text-align: center; padding: 40px; font-size: 10px; color: #94a3b8; font-weight: 800; letter-spacing: 3px; }
+        footer { text-align: center; padding: 30px; font-size: 10px; font-weight: 800; letter-spacing: 5px; color: #94a3b8; }
+        .app-section { display: none; }
+        .app-section.active { display: block; animation: fadeIn 0.5s ease; }
     </style>
 </head>
 <body>
 
-<div class="bg-blob blob-1"></div>
-<div class="bg-blob blob-2"></div>
+<div class="bg-circle c1"></div>
+<div class="bg-circle c2"></div>
 
 <div id="splash">
-    <div style="font-size: 10px; letter-spacing: 8px; margin-bottom: 10px; opacity: 0.6;">SAARVAIN</div>
-    <div style="font-size: 36px; font-weight: 800;">SPENDY</div>
+    <div style="letter-spacing: 12px; opacity: 0.5; font-size: 10px; margin-bottom: 10px;">SAARVAIN</div>
+    <div style="font-size: 40px; font-weight: 900;">SPENDY</div>
 </div>
 
-<div class="app-container" id="app-container" style="display:none;">
+<div id="menu-overlay" onclick="toggleMenu()"></div>
+<div id="side-menu">
+    <h2 style="font-weight: 900; color: var(--primary); margin-bottom: 30px;">MENU</h2>
+    <a href="https://instagram.com/saarvain" target="_blank" style="text-decoration:none; color:inherit; display:block; padding:15px; font-weight:700;"><i class="fa-brands fa-instagram"></i> Instagram</a>
+    <a href="https://t.me/saarvain" target="_blank" style="text-decoration:none; color:inherit; display:block; padding:15px; font-weight:700;"><i class="fa-brands fa-telegram"></i> Telegram</a>
+    <hr style="margin: 20px 0; border:none; border-top:1px solid #eee;">
+    <h4 style="font-size:12px; color:#94a3b8; margin-bottom:10px;">APP FEEDBACK</h4>
+    <textarea id="feedbackMsg" placeholder="Write here..." style="width:100%; padding:15px; border-radius:15px; border:1px solid #eee; outline:none; font-family:inherit; margin-bottom: 15px;" rows="3"></textarea>
+    <button onclick="sendFeedback()" id="fbBtn" class="btn-main" style="padding:12px; font-size:13px;">Submit</button>
+    <div style="margin-top: auto; text-align: center; font-size: 9px; letter-spacing: 2px; color: #cbd5e1;">POWERED BY SAARVAIN</div>
+</div>
+
+<div class="app-container" id="wrapper" style="display:none;">
     
     <div id="home-page">
-        <h1 class="app-title">SPENDY<span>.</span></h1>
-        
-        <button class="home-btn" style="background: var(--pers-panel);" onclick="openMode('personal')">
-            <span>👤 Personal Wallet</span> <i class="fa-solid fa-chevron-right"></i>
-        </button>
-        
-        <button class="home-btn" style="background: var(--biz-panel);" onclick="triggerBizMode()">
-            <span>💼 Business Pro 👑</span> <i class="fa-solid fa-chevron-right"></i>
-        </button>
-
-        <p style="margin-top: 25px; font-size: 11px; color: #94a3b8; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">
-            Encrypted & Secure
-        </p>
-
-        <div class="bottom-nav">
-            <a href="https://t.me/saarvain" target="_blank" title="Telegram"><i class="fa-brands fa-telegram"></i></a>
-            <a href="https://instagram.com/saarvain" target="_blank" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-            <a href="mailto:support@saarvain.com" title="Support"><i class="fa-solid fa-circle-info"></i></a>
+        <button onclick="toggleMenu()" style="position: absolute; top: 25px; left: 25px; background:none; border:none; font-size: 24px; cursor:pointer;"><i class="fa-solid fa-bars-staggered"></i></button>
+        <h1 style="font-size: 55px; font-weight: 900; margin-bottom: 10px;">SPENDY<span>.</span></h1>
+        <p style="color:#94a3b8; font-weight:800; margin-bottom:50px; letter-spacing:3px;">Track Today. Lead Tomorrow."</p>
+        <div class="mode-grid">
+            <button class="mode-card" style="background: var(--pers-panel);" onclick="startApp('personal')">
+                <i class="fa-solid fa-wallet" style="font-size: 40px; margin-bottom: 20px;"></i>
+                <h2>Personal</h2>
+                <p>Wallet & Daily Life</p>
+            </button>
+            <button class="mode-card" style="background: var(--biz-panel);" onclick="triggerBizMode()">
+                <i class="fa-solid fa-shop" style="font-size: 40px; margin-bottom: 20px;"></i>
+                <h2>Business Pro 👑</h2>
+                <p>Staff & Logistics Pro</p>
+            </button>
         </div>
+        <footer>POWERED BY SAARVAIN</footer>
     </div>
 
-    <div id="main-app">
-        <div class="header-bar">
-            <button onclick="goHome()" style="background:none; border:none; font-weight:700; color:#64748b; cursor:pointer;"><i class="fa-solid fa-arrow-left"></i> BACK</button>
-            
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <button class="refresh-btn" onclick="resetDataPrompt()" title="Refresh Database">
-                    <i class="fa-solid fa-arrows-rotate"></i>
-                </button>
-                
-                <div style="text-align: center; cursor: pointer;" onclick="editBizProfile()">
-                    <b style="font-size: 18px;">SPENDY <i id="edit-pen" class="fa-solid fa-pen-to-square" style="font-size: 10px; display:none; color: var(--primary);"></i></b>
-                </div>
+    <div id="main-app" style="display: none;">
+        <div class="dashboard-header">
+            <button onclick="toggleMenu()" style="background:none; border:none; font-size: 22px; cursor:pointer;"><i class="fa-solid fa-bars-staggered"></i></button>
+            <div style="text-align: center;">
+                <h4 id="biz-name-disp" style="font-weight: 900; font-size: 16px;">SPENDY</h4>
+                <p id="biz-loc-disp" style="font-size: 10px; color: #94a3b8; letter-spacing: 1px;">DASHBOARD <i class="fa-solid fa-pen" id="edit-biz-icon" style="display:none; font-size: 8px; cursor: pointer;" onclick="openBizInfoModal()"></i></p>
             </div>
-
-            <button onclick="exportToPDF()" style="background:none; border:none; color:var(--primary); font-weight:800; cursor:pointer;">PDF <i class="fa-solid fa-download"></i></button>
+            <div style="display:flex; gap:10px;">
+                <button onclick="switchModePrompt()" style="background:#fff; border:1px solid #eee; width:45px; height:45px; border-radius:15px; color:var(--primary); cursor:pointer;"><i class="fa-solid fa-arrows-rotate"></i></button>
+                <button onclick="location.reload()" style="background:#fff; border:1px solid #eee; width:45px; height:45px; border-radius:15px; color:#111; cursor:pointer;"><i class="fa-solid fa-house"></i></button>
+            </div>
         </div>
 
-        <div class="dashboard-grid">
-            <div class="panel">
-                <div id="hero" class="hero-box">
-                    <p id="hero-label">BALANCE</p>
-                    <h1 id="total-display">₹0</h1>
-                </div>
-                <div id="p-budget-box">
-                    <p style="font-size: 11px; margin-bottom: 5px; font-weight: bold;">MONTHLY BUDGET</p>
-                    <input type="number" id="budgetInput" placeholder="Ex: 25000" oninput="saveBudget()">
-                </div>
-                <div id="cat-section" style="display:none;">
-                    <p style="font-size: 11px; margin-bottom: 5px; font-weight: bold;">CATEGORY</p>
-                    <div class="category-scroll">
-                        <div class="chip selected" onclick="setCat('Other', this)">Other</div>
-                        <div class="chip" onclick="setCat('Porter', this)">📦 Porter</div>
-                        <div class="chip" onclick="setCat('Staff', this)">👥 Staff</div>
+        <div class="dashboard-grid" style="padding: 0 20px 140px 20px;">
+            <div id="sec-home" class="app-section active">
+                <div id="hero" class="hero-card">
+                    <p style="font-size: 12px; font-weight: 700; opacity: 0.8; letter-spacing:1px; margin-bottom: 10px;">AVAILABLE BALANCE</p>
+                    <h1 id="total-display" style="font-size: 60px; font-weight: 900;">₹0</h1>
+                    <div id="budget-ui" style="margin-top: 15px;">
+                        <input type="number" id="budgetInput" placeholder="Set Monthly Budget" style="max-width: 200px; background: rgba(255,255,255,0.2); border: none; color: #fff; text-align: center; margin-bottom: 0;" oninput="saveBudget()">
                     </div>
                 </div>
-                <input type="text" id="desc" placeholder="Spent on what?">
-                <input type="number" id="amt" placeholder="Amount (₹)">
-                <button id="main-add-btn" class="add-btn" onclick="addEntry()">Add Transaction</button>
+                <div class="panel">
+                    <div class="chip-container" id="category-list"></div>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 15px;">
+                        <input type="text" id="desc" placeholder="What did you spend on?">
+                        <input type="number" id="amt" placeholder="Amount (₹)">
+                        <button class="btn-main" onclick="addEntry()">Save Transaction</button>
+                    </div>
+                </div>
+                <div id="recent-list" style="margin-top: 20px;"></div>
             </div>
 
-            <div class="panel">
-                <h4 style="margin-bottom: 20px;">History</h4>
-                <div id="list" class="history-list"></div>
+            <div id="sec-history" class="app-section">
+                <div class="panel">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+                        <h3>History</h3>
+                        <div style="display:flex; gap:12px;">
+                            <button onclick="resetData()" style="background:none; border:1px solid #eee; padding:12px; border-radius:15px; color:#ef4444;"><i class="fa-solid fa-trash-can"></i></button>
+                            <button onclick="exportToPDF()" style="background:var(--primary); color:#fff; border:none; padding:12px 25px; border-radius:15px; font-weight:800;">PDF</button>
+                        </div>
+                    </div>
+                    <div id="full-list"></div>
+                </div>
             </div>
 
-            <div id="chart-panel" class="panel">
-                <h4 style="margin-bottom: 20px; text-align: center;">Breakdown</h4>
-                <canvas id="spendChart"></canvas>
-                <div id="no-data-msg" style="text-align: center; color: #999; margin-top: 30px;">No data yet</div>
+            <div id="sec-chart" class="app-section">
+                <div class="panel">
+                    <div style="width: 100%; max-width: 300px; margin: 0 auto;">
+                        <canvas id="spendChart"></canvas>
+                    </div>
+                    <div id="calendar" style="display:grid; grid-template-columns: repeat(7,1fr); gap:8px; margin-top:25px;"></div>
+                </div>
             </div>
         </div>
         <footer>POWERED BY SAARVAIN</footer>
     </div>
+
+    <nav class="bottom-nav" id="universal-nav" style="display: none;">
+        <div class="nav-item" onclick="showSec('sec-history', this)"><i class="fa-solid fa-receipt"></i></div>
+        <div class="nav-item active" onclick="showSec('sec-home', this)"><i class="fa-solid fa-plus-circle"></i></div>
+        <div class="nav-item" onclick="showSec('sec-chart', this)"><i class="fa-solid fa-chart-bar"></i></div>
+    </nav>
 </div>
 
 <div id="payment-modal" class="modal-overlay">
     <div class="modal-content">
-        <div style="font-size: 40px; margin-bottom: 10px;">👑</div>
-        <h2>Unlock Business Pro</h2>
-        <p style="font-size: 13px; color: #64748b; margin-bottom: 10px;">Get Business Analytics & PDF Reports.</p>
-        <p style="font-size: 12px; color: var(--primary); font-weight: 700; margin-bottom: 20px;">
-            DM <a href="https://instagram.com/saarvain" target="_blank" style="color: var(--primary); text-decoration: underline;">@saarvain</a> to get your Activation Key!
-        </p>
-        <div style="background: #f1f5f9; padding: 15px; border-radius: 20px; margin-bottom: 20px;">
-            <span style="font-size: 24px; font-weight: 800;">₹49</span>
+        <div style="font-size: 40px; margin-bottom: 15px;">👑</div>
+        <h2>Business Pro</h2>
+        <p style="font-size: 13px; color: #64748b; margin-bottom: 25px;">DM <a href="https://instagram.com/saarvain" target="_blank" style="color: var(--primary); font-weight: 800;">@saarvain</a> for Key!</p>
+        <button class="btn-main" style="margin-bottom: 20px;" onclick="window.open('https://instagram.com/saarvain', '_blank')">DM TO BUY (₹49)</button>
+        <div style="border-top: 1px solid #eee; padding-top: 20px;">
+            <input type="text" id="activationCode" placeholder="Enter Key" style="text-align: center;">
+            <button id="activate-btn" class="btn-main" style="background: #000;" onclick="checkActivationCode()">Activate</button>
         </div>
-        <button class="add-btn" style="background: var(--primary); margin-bottom: 15px;" onclick="window.open('https://instagram.com/saarvain', '_blank')">
-            <i class="fa-brands fa-instagram"></i> DM TO BUY
-        </button>
-        <div style="border-top: 1px solid #eee; padding-top: 15px; margin-top: 10px;">
-            <p style="font-size: 10px; font-weight: bold; margin-bottom: 8px;">ALREADY PAID? ENTER KEY:</p>
-            <input type="text" id="activationCode" placeholder="Secret Key" style="text-align: center; border: 2px solid #edf2f7;">
-            <button id="activate-btn" class="add-btn" style="background: #000; padding: 12px;" onclick="checkActivationCode()">Activate Pro</button>
-        </div>
-        <button onclick="closeModals()" style="background:none; border:none; color:#94a3b8; cursor:pointer; margin-top: 20px; font-size: 13px; font-weight: 600;">Maybe Later</button>
+        <button onclick="closeModals()" style="background:none; border:none; color:#94a3b8; cursor:pointer; margin-top: 25px;">Later</button>
     </div>
 </div>
 
 <div id="biz-info-modal" class="modal-overlay">
     <div class="modal-content">
-        <h3>Business Details</h3>
-        <input type="text" id="modalBizName" placeholder="Shop Name">
-        <input type="text" id="modalBizBranch" placeholder="Location">
-        <button class="add-btn" style="background: #000;" onclick="saveBizDetails()">Open Dashboard</button>
+        <h2 style="margin-bottom: 10px;">Shop Details</h2>
+        <input type="text" id="bizNameInput" placeholder="Shop Name">
+        <input type="text" id="bizLocInput" placeholder="Location">
+        <button class="btn-main" onclick="saveBizInfo()">Save & Open</button>
     </div>
 </div>
 
 <script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyB-fZ2qA8aB_-Ra3I3WHa6RuoYFm-QabRY",
-        authDomain: "click-cha.firebaseapp.com",
-        databaseURL: "https://click-cha-default-rtdb.firebaseio.com",
-        projectId: "click-cha",
-        storageBucket: "click-cha.firebasestorage.app",
-        messagingSenderId: "231261928692",
-        appId: "1:231261928692:web:76e53480670c49b40932a1",
-        measurementId: "G-NZR6ZQQ1QZ"
-    };
-
+    const firebaseConfig = { apiKey: "AIzaSyB-fZ2qA8aB_-Ra3I3WHa6RuoYFm-QabRY", authDomain: "click-cha.firebaseapp.com", databaseURL: "https://click-cha-default-rtdb.firebaseio.com", projectId: "click-cha", storageBucket: "click-cha.firebasestorage.app", messagingSenderId: "231261928692", appId: "1:231261928692:web:76e53480670c49b40932a1" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    let state = JSON.parse(localStorage.getItem('spendy_v7')) || { 
-        pData: [], bData: [], pBudget: 0, bizName: "", bizBranch: "", isPro: false 
-    };
-    let currentMode = 'personal';
-    let currentCat = 'Other';
-    let myChart = null;
+    let state = JSON.parse(localStorage.getItem('spendy_v21')) || { pData: [], bData: [], pBudget: 0, bCats: ['Staff', 'Porter', 'Stock'], pCats: ['Food', 'Travel', 'Rent'], isPro: false, bizName: '', bizLoc: '' };
+    let mode = 'personal';
+    let selectedCat = 'Other';
+    let chart = null;
 
-    setTimeout(() => {
-        document.getElementById('splash').style.opacity = '0';
-        setTimeout(() => {
-            document.getElementById('splash').style.display = 'none';
-            document.getElementById('app-container').style.display = 'block';
-        }, 500);
-    }, 1500);
+    setTimeout(() => { document.getElementById('splash').style.opacity = '0'; setTimeout(() => { document.getElementById('splash').style.display = 'none'; document.getElementById('wrapper').style.display = 'block'; }, 500); }, 1500);
 
     function triggerBizMode() {
-        if (state.isPro) {
-            if (state.bizName && state.bizBranch) openMode('business');
-            else document.getElementById('biz-info-modal').style.display = 'flex';
-        } else document.getElementById('payment-modal').style.display = 'flex';
+        if (state.isPro) { if(!state.bizName) openBizInfoModal(); else startApp('business'); }
+        else document.getElementById('payment-modal').style.display = 'flex';
+    }
+
+    function openBizInfoModal() { document.getElementById('biz-info-modal').style.display = 'flex'; }
+    function saveBizInfo() {
+        state.bizName = document.getElementById('bizNameInput').value.trim() || 'My Business';
+        state.bizLoc = document.getElementById('bizLocInput').value.trim() || 'Gurugram';
+        save(); closeModals(); startApp('business');
     }
 
     async function checkActivationCode() {
-        const inputKey = document.getElementById('activationCode').value.trim();
+        const key = document.getElementById('activationCode').value.trim();
+        if(!key) return;
         const btn = document.getElementById('activate-btn');
-        if(!inputKey) return;
         btn.innerText = "Checking...";
-        try {
-            const snapshot = await db.ref('spendy_keys/' + inputKey).once('value');
-            if (snapshot.val() === "USED") {
-                state.isPro = true; save();
-                Swal.fire({ icon: 'success', title: 'Unlocked!', text: 'Pro Active! 👑', confirmButtonColor: '#6c5ce7', didOpen: () => Swal.getPopup().style.zIndex = '10000' })
-                .then(() => { closeModals(); triggerBizMode(); });
-            } else {
-                Swal.fire({ icon: 'error', title: 'Error', text: 'Invalid Key!', confirmButtonColor: '#eb4d4b', didOpen: () => Swal.getPopup().style.zIndex = '10000' });
-            }
-        } catch (e) {
-            Swal.fire({ icon: 'error', title: 'Network', text: 'Check Connection', didOpen: () => Swal.getPopup().style.zIndex = '10000' });
-        } finally { btn.innerText = "Activate Pro"; }
+        const snapshot = await db.ref('spendy_keys/' + key).once('value');
+        if (snapshot.val() === "USED") {
+            state.isPro = true; save();
+            Swal.fire('Unlocked!', 'Business Pro Active', 'success').then(() => { closeModals(); triggerBizMode(); });
+        } else { Swal.fire('Error', 'Invalid Key!', 'error'); }
+        btn.innerText = "Activate";
     }
 
-    function openMode(m) {
-        currentMode = m;
+    function startApp(m) {
+        mode = m;
         document.getElementById('home-page').style.display = 'none';
         document.getElementById('main-app').style.display = 'block';
-        const isBiz = m === 'business';
-        document.getElementById('hero').style.background = isBiz ? 'var(--biz-panel)' : 'var(--pers-panel)';
-        document.getElementById('cat-section').style.display = isBiz ? 'block' : 'none';
-        document.getElementById('p-budget-box').style.display = isBiz ? 'none' : 'block';
-        document.getElementById('chart-panel').style.opacity = isBiz ? '1' : '0';
-        document.getElementById('main-add-btn').style.background = isBiz ? '#1e293b' : 'var(--primary)';
-        document.getElementById('edit-pen').style.display = isBiz ? 'inline-block' : 'none';
-        refresh();
+        document.getElementById('universal-nav').style.display = 'flex';
+        const isB = m === 'business';
+        document.getElementById('hero').style.background = isB ? 'var(--biz-panel)' : 'var(--pers-panel)';
+        document.getElementById('budget-ui').style.display = isB ? 'none' : 'block';
+        document.getElementById('biz-name-disp').innerText = isB ? state.bizName : 'SPENDY';
+        document.getElementById('biz-loc-disp').innerHTML = isB ? `${state.bizLoc} <i class="fa-solid fa-pen" onclick="openBizInfoModal()"></i>` : 'DASHBOARD';
+        loadCategories(); refresh(); renderCalendar();
+    }
+
+    function loadCategories() {
+        const container = document.getElementById('category-list');
+        container.innerHTML = '';
+        const cats = mode === 'personal' ? state.pCats : state.bCats;
+        cats.forEach(c => {
+            const span = document.createElement('span');
+            span.className = 'chip';
+            span.innerText = c;
+            span.onclick = () => { selectedCat = c; document.querySelectorAll('.chip').forEach(x => x.classList.remove('selected')); span.classList.add('selected'); };
+            container.appendChild(span);
+        });
+        const add = document.createElement('span');
+        add.className = 'chip chip-add'; add.innerHTML = '+';
+        add.onclick = async () => {
+            const { value: nc } = await Swal.fire({ title: 'New Category', input: 'text' });
+            if(nc) { if(mode === 'personal') state.pCats.push(nc); else state.bCats.push(nc); save(); loadCategories(); }
+        };
+        container.appendChild(add);
+        selectedCat = 'Other';
     }
 
     function addEntry() {
         const d = document.getElementById('desc').value, a = document.getElementById('amt').value;
         if(!d || !a) return;
-        state[currentMode === 'personal' ? 'pData' : 'bData'].push({ d, a: parseFloat(a), cat: currentMode === 'business' ? currentCat : 'Personal', dt: new Date().toLocaleDateString('en-IN') });
+        const target = mode === 'personal' ? 'pData' : 'bData';
+        state[target].push({ id: Date.now(), d, a: parseFloat(a), cat: selectedCat, dt: new Date().toLocaleDateString('en-IN'), ts: new Date().getTime() });
         document.getElementById('desc').value = ''; document.getElementById('amt').value = '';
-        save(); refresh();
+        save(); refresh(); renderCalendar();
     }
 
-    function resetDataPrompt() {
-        Swal.fire({
-            title: 'Refresh Data?',
-            text: "Aapka sara transaction history clear ho jayega.",
-            icon: 'info',
-            showCancelButton: true,
-            confirmButtonColor: '#6c5ce7',
-            confirmButtonText: 'Yes, Refresh!',
-            didOpen: () => Swal.getPopup().style.zIndex = '10000'
-        }).then((res) => {
-            if (res.isConfirmed) {
-                state.pData = []; state.bData = []; state.pBudget = 0;
-                save(); refresh();
-            }
-        });
-    }
-
-    function save() { localStorage.setItem('spendy_v7', JSON.stringify(state)); }
-    function goHome() { document.getElementById('main-app').style.display = 'none'; document.getElementById('home-page').style.display = 'block'; }
-    function closeModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none'); }
-    function setCat(c, el) { currentCat = c; document.querySelectorAll('.chip').forEach(ch => ch.classList.remove('selected')); el.classList.add('selected'); }
-    function saveBudget() { state.pBudget = parseFloat(document.getElementById('budgetInput').value) || 0; save(); refresh(); }
-    function editBizProfile() { if(currentMode === 'business') document.getElementById('biz-info-modal').style.display = 'flex'; }
-    function saveBizDetails() {
-        state.bizName = document.getElementById('modalBizName').value || "My Biz";
-        state.bizBranch = document.getElementById('modalBizBranch').value || "Main";
-        save(); closeModals(); openMode('business');
+    function deleteEntry(id) {
+        const target = mode === 'personal' ? 'pData' : 'bData';
+        state[target] = state[target].filter(i => i.id !== id);
+        save(); refresh(); renderCalendar();
     }
 
     function refresh() {
-        const listDiv = document.getElementById('list'); listDiv.innerHTML = '';
-        let total = 0, catTotals = {};
-        const activeList = currentMode === 'personal' ? state.pData : state.bData;
-        activeList.slice().reverse().forEach(item => {
-            total += item.a;
-            if(currentMode === 'business') catTotals[item.cat] = (catTotals[item.cat] || 0) + item.a;
-            listDiv.innerHTML += `<div class="item-card"><div><b>${item.d}</b><small>${item.dt} • ${item.cat}</small></div><div class="item-price">₹${item.a.toLocaleString('en-IN')}</div></div>`;
+        const recent = document.getElementById('recent-list'), full = document.getElementById('full-list');
+        recent.innerHTML = ''; full.innerHTML = '';
+        let total = 0;
+        const data = mode === 'personal' ? state.pData : state.bData;
+        const today = new Date().toLocaleDateString('en-IN');
+        data.slice().reverse().forEach(i => {
+            total += i.a;
+            const row = `<div class="item-row"><div><b>${i.d}</b><br><small>${i.dt} • ${i.cat}</small></div><div style="display:flex; align-items:center; gap:15px;"><div style="color:#eb4d4b; font-weight:800">₹${i.a}</div><button class="del-btn" onclick="deleteEntry(${i.id})"><i class="fa-solid fa-trash-can"></i></button></div></div>`;
+            full.innerHTML += row;
+            if(i.dt === today) recent.innerHTML += row;
         });
-        document.getElementById('total-display').innerText = "₹" + (currentMode === 'personal' ? (state.pBudget - total) : total).toLocaleString('en-IN');
-        if(currentMode === 'business') renderChart(catTotals);
+        document.getElementById('total-display').innerText = "₹" + (mode === 'personal' ? (state.pBudget - total) : total).toLocaleString();
+        updateChart(data);
     }
 
-    function renderChart(data) {
+    function updateChart(data) {
         const ctx = document.getElementById('spendChart').getContext('2d');
-        if(myChart) myChart.destroy();
-        const keys = Object.keys(data);
-        if(!keys.length) return;
-        myChart = new Chart(ctx, { type: 'doughnut', data: { labels: keys, datasets: [{ data: Object.values(data), backgroundColor: ['#6c5ce7', '#00cec9', '#ff7675', '#fdcb6e'], borderWidth: 0 }] }, options: { plugins: { legend: { position: 'bottom' } }, cutout: '70%' } });
+        if(chart) chart.destroy();
+        const cats = {};
+        data.forEach(i => cats[i.cat] = (cats[i.cat] || 0) + i.a);
+        chart = new Chart(ctx, { type: 'doughnut', data: { labels: Object.keys(cats), datasets: [{ data: Object.values(cats), backgroundColor: ['#6c5ce7', '#00cec9', '#ff7675', '#fdcb6e', '#a29bfe'], borderWeight: 0 }] }, options: { cutout: '75%', plugins: { legend: { display: false } } } });
+    }
+
+    function renderCalendar() {
+        const cal = document.getElementById('calendar'); cal.innerHTML = '';
+        const data = mode === 'personal' ? state.pData : state.bData;
+        const today = new Date();
+        for(let i=0; i<14; i++) {
+            let d = new Date(); d.setDate(today.getDate() - i);
+            let ds = d.toLocaleDateString('en-IN');
+            let dayTotal = data.filter(x => x.dt === ds).reduce((s, x) => s + x.a, 0);
+            let div = document.createElement('div');
+            div.style = `padding:12px 5px; background:${dayTotal > 0 ? '#e0e7ff':'#f9fafb'}; border-radius:15px; text-align:center; font-size:10px; border: 1px solid ${dayTotal > 0 ? 'var(--primary)':'#eee'}; cursor: pointer;`;
+            div.innerHTML = `<b>${d.getDate()}</b><br>₹${dayTotal}`;
+            cal.appendChild(div);
+        }
     }
 
     function exportToPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        let total = 0;
-        const data = currentMode === 'personal' ? state.pData : state.bData;
-        data.forEach(i => total += i.a);
-        doc.setFontSize(14); doc.text("SAARVAIN // SPENDY", 14, 15);
-        if(currentMode === 'business') doc.text(`${state.bizName.toUpperCase()}`, 14, 32);
-        const rows = data.map(i => [i.dt, i.cat, i.d, `Rs. ${i.a.toLocaleString('en-IN')}`]);
-        doc.autoTable({ head: [['Date', 'Category', 'Description', 'Amount']], body: rows, startY: 38, theme: 'grid' });
-        doc.save(`Spendy_Report.pdf`);
+        const data = mode === 'personal' ? state.pData : state.bData;
+        const title = mode === 'business' ? state.bizName.toUpperCase() : "PERSONAL WALLET";
+        doc.setFontSize(18); doc.text(title, 14, 20);
+        doc.setFontSize(10); doc.text(`${mode === 'business' ? state.bizLoc : ''} | Generated by Spendy`, 14, 28);
+        const rows = data.map(i => [i.dt, i.cat, i.d, "Rs. " + i.a.toLocaleString()]);
+        doc.autoTable({ head: [['Date', 'Category', 'Note', 'Amount']], body: rows, startY: 35, theme: 'grid', headStyles: { fillColor: [108, 92, 231] } });
+        const total = data.reduce((s, i) => s + i.a, 0);
+        const finalY = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(12); doc.setFont(undefined, 'bold');
+        doc.text(`GRAND TOTAL: Rs. ${total.toLocaleString()}`, 14, finalY);
+        doc.text("POWERED BY SAARVAIN", 14, finalY + 10);
+        doc.save(`${title}_Report.pdf`);
     }
+
+    function toggleMenu() { document.getElementById('side-menu').classList.toggle('open'); document.getElementById('menu-overlay').style.display = document.getElementById('side-menu').classList.contains('open') ? 'block' : 'none'; }
+    function closeModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none'); }
+    function save() { localStorage.setItem('spendy_v21', JSON.stringify(state)); }
+    function showSec(id, el) { document.querySelectorAll('.app-section').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); el.classList.add('active'); }
+    function switchModePrompt() { const n = mode === 'personal' ? 'business' : 'personal'; if(n === 'business') triggerBizMode(); else startApp(n); }
+    function saveBudget() { state.pBudget = parseFloat(document.getElementById('budgetInput').value) || 0; save(); refresh(); }
+    function resetData() { Swal.fire({ title: 'Clear History?', icon: 'warning', showCancelButton: true }).then(r => { if(r.isConfirmed) { if(mode === 'personal') state.pData = []; else state.bData = []; save(); refresh(); renderCalendar(); } }); }
+    function sendFeedback() { const m = document.getElementById('feedbackMsg').value; if(!m) return; const f = new FormData(); f.append('app', 'Spendy'); f.append('message', m); fetch('https://script.google.com/macros/s/AKfycbz3wk6iVLZV8HqYHBdlUD39uj7YgLPBoOwmaBT6TL29VpCXlTCL7KN_eRgMAPtAc6oO/exec', { method: 'POST', body: f }).then(() => { Swal.fire('Sent!', 'Thanks!', 'success'); document.getElementById('feedbackMsg').value = ''; toggleMenu(); }); }
 </script>
+
 </body>
 </html>
