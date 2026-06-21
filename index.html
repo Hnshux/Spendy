@@ -4,355 +4,167 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spendy Pro | SAARVAIN</title>
-    
+    <!-- CSS Icons and Custom Stylesheet -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        :root {
-            --primary: #6c5ce7;
-            --biz-panel: linear-gradient(135deg, #4b6cb7, #182848);
-            --pers-panel: linear-gradient(135deg, #667eea, #764ba2);
-            --bg-light: #f4f7fe;
-            --text-dark: #1f2937;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg-light); color: var(--text-dark); overflow-x: hidden; position: relative; }
-
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .bg-circle { position: fixed; border-radius: 50%; filter: blur(60px); opacity: 0.12; z-index: -1; }
-        .c1 { top: 10%; left: 10%; width: 150px; height: 150px; background: var(--primary); }
-        .c2 { bottom: 15%; right: 5%; width: 200px; height: 200px; background: #4b6cb7; }
-
-        #splash { position: fixed; inset: 0; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; color: #fff; transition: 0.6s ease; }
-
-        #side-menu { position: fixed; top: 0; left: -300px; width: 280px; height: 100%; background: #fff; z-index: 2000; transition: 0.4s; padding: 30px; border-right: 1px solid #e5e7eb; }
-        #side-menu.open { left: 0; }
-        #menu-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; z-index: 1500; backdrop-filter: blur(2px); }
-
-        .app-container { width: 100%; max-width: 1300px; margin: 0 auto; min-height: 100vh; position: relative; }
-
-        #home-page { padding: 40px 20px; text-align: center; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; animation: slideUp 0.6s ease; }
-        .mode-grid { display: grid; grid-template-columns: 1fr; gap: 25px; width: 100%; max-width: 800px; margin: 0 auto; padding: 20px 0; }
-        @media (min-width: 768px) { .mode-grid { grid-template-columns: 1fr 1fr; } }
-        .mode-card { padding: 45px; border-radius: 35px; border: none; cursor: pointer; color: #fff; text-align: left; transition: 0.3s; }
-        .mode-card:hover { transform: translateY(-10px); }
-
-        .dashboard-header { display: flex; justify-content: space-between; align-items: center; padding: 25px 20px; animation: fadeIn 0.5s; }
-        .panel { background: #fff; border-radius: 25px; padding: 30px; border: 1px solid #e5e7eb; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
-        .hero-card { border-radius: 35px; padding: 50px 20px; color: #fff; text-align: center; margin-bottom: 30px; }
-
-        .chip-container { display: flex; gap: 12px; overflow-x: auto; margin-bottom: 25px; padding-bottom: 8px; scrollbar-width: none; }
-        .chip { padding: 12px 22px; background: #fff; border: 1px solid #eee; border-radius: 15px; cursor: pointer; font-size: 13px; font-weight: 700; white-space: nowrap; }
-        .chip.selected { background: #111; color: #fff; border-color: #111; }
-
-        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 18px; background: #fff; border-radius: 18px; margin-bottom: 12px; border: 1px solid #f3f4f6; animation: slideUp 0.4s ease; }
-        .del-btn { background: none; border: none; color: #ff7675; cursor: pointer; padding: 5px; font-size: 15px; opacity: 0.6; }
-
-        .bottom-nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 420px; background: #111; border-radius: 30px; display: flex; justify-content: space-around; padding: 20px; z-index: 1000; box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
-        .nav-item { color: #555; font-size: 22px; cursor: pointer; transition: 0.3s; }
-        .nav-item.active { color: #fff; transform: translateY(-5px); }
-
-        input { width: 100%; padding: 18px; border: 1px solid #eee; border-radius: 18px; background: #fafafa; font-size: 16px; outline: none; margin-bottom: 15px; }
-        .btn-main { width: 100%; padding: 18px; border: none; border-radius: 18px; font-weight: 800; cursor: pointer; color: #fff; background: var(--primary); transition: 0.3s; }
-
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; align-items: center; justify-content: center; z-index: 8000; backdrop-filter: blur(10px); }
-        .modal-content { background: #fff; width: 90%; max-width: 400px; padding: 40px; border-radius: 40px; text-align: center; animation: slideUp 0.4s; }
-
-        footer { text-align: center; padding: 30px; font-size: 10px; font-weight: 800; letter-spacing: 5px; color: #94a3b8; }
-        .app-section { display: none; }
-        .app-section.active { display: block; animation: fadeIn 0.4s ease; }
-
-        /* Chart 1:1 Fix */
-        .chart-container { width: 100%; max-width: 250px; margin: 0 auto; aspect-ratio: 1 / 1; position: relative; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="bg-circle c1"></div>
-<div class="bg-circle c2"></div>
+    <!-- Custom Alert Container -->
+    <div id="custom-toast-container"></div>
 
-<div id="splash">
-    <div style="letter-spacing: 12px; opacity: 0.5; font-size: 10px; margin-bottom: 10px;">Kirtan</div>
-    <div style="font-size: 40px; font-weight: 900;">SPENDY</div>
-</div>
-
-<div id="menu-overlay" onclick="toggleMenu()"></div>
-<div id="side-menu">
-    <h2 style="font-weight: 900; color: var(--primary); margin-bottom: 30px;">MENU</h2>
-    <a href="https://instagram.com/saarvain" target="_blank" style="text-decoration:none; color:inherit; display:block; padding:15px; font-weight:700;"><i class="fa-brands fa-instagram"></i> Instagram</a>
-    <a href="https://t.me/saarvain" target="_blank" style="text-decoration:none; color:inherit; display:block; padding:15px; font-weight:700;"><i class="fa-brands fa-telegram"></i> Telegram</a>
-    <hr style="margin: 20px 0; border:none; border-top:1px solid #eee;">
-    <h4 style="font-size:12px; color:#94a3b8; margin-bottom:10px;">APP FEEDBACK</h4>
-    <textarea id="feedbackMsg" placeholder="Write here..." style="width:100%; padding:15px; border-radius:15px; border:1px solid #eee; outline:none; font-family:inherit; margin-bottom: 15px;" rows="3"></textarea>
-    <button onclick="sendFeedback()" id="fbBtn" class="btn-main" style="padding:12px; font-size:13px;">Submit</button>
-    <div style="margin-top: auto; text-align: center; font-size: 9px; letter-spacing: 2px; color: #cbd5e1;"></div>
-</div>
-
-<div class="app-container" id="wrapper" style="display:none;">
-    <div id="home-page">
-        <button onclick="toggleMenu()" style="position: absolute; top: 25px; left: 25px; background:none; border:none; font-size: 24px; cursor:pointer;"><i class="fa-solid fa-bars-staggered"></i></button>
-        <h1 style="font-size: 55px; font-weight: 900; margin-bottom: 10px;">SPENDY<span>.</span></h1>
-        <p style="color:#94a3b8; font-weight:800; margin-bottom:50px; letter-spacing:3px;">YOUR PERSONAL FINANCE ncdsbjdjbfb</p>
-        <div class="mode-grid">
-            <button class="mode-card" style="background: var(--pers-panel);" onclick="startApp('personal')">
-                <i class="fa-solid fa-wallet" style="font-size: 40px; margin-bottom: 20px;"></i>
-                <h2>Personal</h2>
-                <p>Wallet & Daily Life</p>
-            </button>
-            <button class="mode-card" style="background: var(--biz-panel);" onclick="triggerBizMode()">
-                <i class="fa-solid fa-shop" style="font-size: 40px; margin-bottom: 20px;"></i>
-                <h2>Business Pro 👑</h2>
-                <p>Kirten Sir </p>
-            </button>
-        </div>
-        <footer>Kirten Sir</footer>
+    <!-- Splash Screen -->
+    <div id="splash">
+        <div class="splash-brand">SAARVAIN</div>
+        <div class="splash-logo">SPENDY</div>
     </div>
 
-    <div id="main-app" style="display: none;">
-        <div class="dashboard-header">
-            <button onclick="toggleMenu()" style="background:none; border:none; font-size: 22px; cursor:pointer;"><i class="fa-solid fa-bars-staggered"></i></button>
-            <div style="text-align: center;">
-                <h4 id="biz-name-disp" style="font-weight: 900; font-size: 16px;">SPENDY</h4>
-                <p id="biz-loc-disp" style="font-size: 10px; color: #94a3b8; letter-spacing: 1px;">DASHBOARD <i class="fa-solid fa-pen" id="edit-biz-icon" style="display:none; cursor:pointer;" onclick="openBizInfoModal()"></i></p>
+    <!-- Sidebar Menu Overlay -->
+    <div id="menu-overlay" onclick="toggleMenu()"></div>
+    
+    <!-- Sidebar Drawer -->
+    <div id="side-menu">
+        <h3 class="menu-title">NAVIGATE</h3>
+        <a href="https://instagram.com/saarvain" target="_blank" class="menu-link"><i class="fa-brands fa-instagram"></i> Instagram</a>
+        <a href="https://t.me/saarvain" target="_blank" class="menu-link"><i class="fa-brands fa-telegram"></i> Telegram</a>
+        <hr class="menu-divider">
+        <h4 class="menu-subtitle">FEEDBACK</h4>
+        <textarea id="feedbackMsg" placeholder="Write message..." rows="3"></textarea>
+        <button onclick="sendFeedback()" id="fbBtn" class="btn-main small-btn">Submit</button>
+    </div>
+
+    <!-- Main Wrapper App Layout -->
+    <div class="app-container" id="wrapper" style="display:none;">
+        
+        <!-- Home Dashboard Selection -->
+        <div id="home-page">
+            <button onclick="toggleMenu()" class="burger-btn"><i class="fa-solid fa-bars-staggered"></i></button>
+            <h1 class="main-title">SPENDY</h1>
+            <p class="main-tagline">PERSONAL FINANCE ARCHITECT</p>
+            <div class="mode-grid">
+                <button class="mode-card" onclick="startApp('personal')">
+                    <i class="fa-solid fa-wallet personal-icon"></i>
+                    <h3>Personal</h3>
+                    <p>Standard Wallet Tracker</p>
+                </button>
+                <button class="mode-card" onclick="triggerBizMode()">
+                    <i class="fa-solid fa-shop business-icon"></i>
+                    <h3>Business Pro 👑</h3>
+                    <p>Saarvain Special</p>
+                </button>
             </div>
-            <div style="display:flex; gap:10px;">
-                <button onclick="switchModePrompt()" style="background:#fff; border:1px solid #eee; width:45px; height:45px; border-radius:15px; color:var(--primary); cursor:pointer;"><i class="fa-solid fa-arrows-rotate"></i></button>
-                <button onclick="location.reload()" style="background:#fff; border:1px solid #eee; width:45px; height:45px; border-radius:15px; color:#111; cursor:pointer;"><i class="fa-solid fa-house"></i></button>
-            </div>
+            <footer>SAARVAIN</footer>
         </div>
 
-        <div class="dashboard-grid" style="padding: 0 20px 140px 20px;">
-            <div id="sec-home" class="app-section active">
-                <div id="hero" class="hero-card">
-                    <p style="font-size: 12px; font-weight: 700; opacity: 0.8; letter-spacing:1px; margin-bottom: 10px;">AVAILABLE BALANCE</p>
-                    <h1 id="total-display" style="font-size: 60px; font-weight: 900;">₹0</h1>
-                    <div id="budget-ui"><input type="number" id="budgetInput" placeholder="Set Monthly Budget" style="max-width: 200px; background: rgba(255,255,255,0.2); border: none; color: #fff; text-align: center;" oninput="saveBudget()"></div>
+        <!-- Application Dashboard Modules -->
+        <div id="main-app" style="display: none;">
+            <div class="dashboard-header">
+                <button onclick="toggleMenu()" class="header-action-btn"><i class="fa-solid fa-bars-staggered"></i></button>
+                <div class="brand-center">
+                    <h4 id="biz-name-disp">SPENDY</h4>
+                    <p id="biz-loc-disp">DASHBOARD</p>
                 </div>
-                <div class="panel">
-                    <div class="chip-container" id="category-list"></div>
-                    <input type="text" id="desc" placeholder="Spent on what?">
-                    <input type="number" id="amt" placeholder="Amount (₹)">
-                    <button class="btn-main" onclick="addEntry()">Save Transaction</button>
+                <div class="header-controls">
+                    <button onclick="switchModePrompt()" class="icon-btn accent-icon"><i class="fa-solid fa-arrows-rotate"></i></button>
+                    <button onclick="location.reload()" class="icon-btn"><i class="fa-solid fa-house"></i></button>
                 </div>
-                <div id="recent-list"></div>
             </div>
 
-            <div id="sec-history" class="app-section">
-                <div class="panel">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
-                        <h3>History</h3>
-                        <div style="display:flex; gap:12px;">
-                            <button onclick="resetData()" style="background:none; border:1px solid #eee; padding:12px; border-radius:15px; color:#ef4444;"><i class="fa-solid fa-trash-can"></i></button>
-                            <button onclick="exportToPDF()" style="background:var(--primary); color:#fff; border:none; padding:12px 25px; border-radius:15px; font-weight:800;">PDF</button>
+            <div class="dashboard-grid">
+                <!-- Home Module -->
+                <div id="sec-home" class="app-section active">
+                    <div id="hero" class="hero-card">
+                        <p class="hero-label">AVAILABLE BALANCE</p>
+                        <h1 id="total-display">₹0</h1>
+                        <div id="budget-ui">
+                            <input type="number" id="budgetInput" placeholder="Set Monthly Budget" oninput="saveBudget()">
                         </div>
                     </div>
-                    <div id="full-list"></div>
+                    <div class="panel">
+                        <div class="chip-container" id="category-list"></div>
+                        <input type="text" id="desc" placeholder="Spent on what?">
+                        <input type="number" id="amt" placeholder="Amount (₹)">
+                        <button class="btn-main" onclick="addEntry()">Save Transaction</button>
+                    </div>
+                    <div id="recent-list"></div>
+                </div>
+
+                <!-- Ledger/History Module -->
+                <div id="sec-history" class="app-section">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h4>Transaction Log</h4>
+                            <div class="panel-actions">
+                                <button onclick="resetData()" class="icon-btn danger-icon"><i class="fa-solid fa-trash-can"></i></button>
+                                <button onclick="exportToPDF()" class="pdf-btn">PDF</button>
+                            </div>
+                        </div>
+                        <div id="full-list"></div>
+                    </div>
+                </div>
+
+                <!-- Graph Insights Module -->
+                <div id="sec-chart" class="app-section">
+                    <div class="panel text-center">
+                        <h4 class="panel-title">Breakdown Analytics</h4>
+                        <div class="chart-container">
+                            <canvas id="spendChart"></canvas>
+                        </div>
+                        <div id="calendar"></div>
+                    </div>
                 </div>
             </div>
+            <footer>POWERED BY SAARVAIN</footer>
+        </div>
 
-            <div id="sec-chart" class="app-section">
-                <div class="panel" style="text-align: center;">
-                    <h3 style="margin-bottom: 20px;">Insights</h3>
-                    <div class="chart-container">
-                        <canvas id="spendChart"></canvas>
-                    </div>
-                    <div id="calendar" style="display:grid; grid-template-columns: repeat(7,1fr); gap:8px; margin-top:25px;"></div>
-                </div>
+        <!-- Navigation Control Grid -->
+        <nav class="bottom-nav" id="universal-nav" style="display: none;">
+            <div class="nav-item" onclick="showSec('sec-history', this)"><i class="fa-solid fa-receipt"></i></div>
+            <div class="nav-item active" onclick="showSec('sec-home', this)"><i class="fa-solid fa-plus-circle"></i></div>
+            <div class="nav-item" onclick="showSec('sec-chart', this)"><i class="fa-solid fa-chart-bar"></i></div>
+        </nav>
+    </div>
+
+    <!-- Modal Dialogs -->
+    <div id="payment-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Unlock Business Pro</h3>
+            <p class="modal-desc">Contact <a href="https://instagram.com/saarvain" target="_blank">@saarvain</a> directly for prompt access keys.</p>
+            <button class="btn-main instagram-btn" onclick="window.open('https://instagram.com/saarvain', '_blank')">DM on Instagram (₹49)</button>
+            <input type="text" id="activationCode" placeholder="Enter Token Key">
+            <button id="activate-btn" class="btn-main dark-btn" onclick="checkActivationCode()">Activate License</button>
+            <button onclick="closeModals()" class="dismiss-btn">Dismiss</button>
+        </div>
+    </div>
+
+    <div id="biz-info-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="panel-title">Business Profile</h3>
+            <input type="text" id="bizNameInput" placeholder="Enterprise Name">
+            <input type="text" id="bizLocInput" placeholder="Operating Branch Location">
+            <button class="btn-main" onclick="saveBizInfo()">Initialize Workspace</button>
+        </div>
+    </div>
+
+    <div id="cat-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="modal-title-left">New Category</h3>
+            <input type="text" id="newCatInput" placeholder="Enter Custom Category Name">
+            <div class="modal-actions-right">
+                <button onclick="closeModals()" class="cancel-btn">Cancel</button>
+                <button class="btn-main inline-btn" onclick="submitCustomCategory()">Add</button>
             </div>
         </div>
-        <footer>POWERED BY SAARVAIN</footer>
     </div>
 
-    <nav class="bottom-nav" id="universal-nav" style="display: none;">
-        <div class="nav-item" onclick="showSec('sec-history', this)"><i class="fa-solid fa-receipt"></i></div>
-        <div class="nav-item active" onclick="showSec('sec-home', this)"><i class="fa-solid fa-plus-circle"></i></div>
-        <div class="nav-item" onclick="showSec('sec-chart', this)"><i class="fa-solid fa-chart-bar"></i></div>
-    </nav>
-</div>
-
-<div id="payment-modal" class="modal-overlay">
-    <div class="modal-content">
-        <div style="font-size: 40px; margin-bottom: 15px;">👑</div>
-        <h2>Unlock Business Pro</h2>
-        <p style="font-size: 13px; color: #64748b; margin-bottom: 25px;">DM <a href="https://instagram.com/saarvain" target="_blank" style="color: var(--primary); font-weight: 800;">@saarvain</a> for Key!</p>
-        <button class="btn-main" style="margin-bottom: 20px;" onclick="window.open('https://instagram.com/saarvain', '_blank')">DM TO BUY (₹49)</button>
-        <input type="text" id="activationCode" placeholder="Enter Key" style="text-align: center; margin-bottom: 10px;">
-        <button id="activate-btn" class="btn-main" style="background: #000;" onclick="checkActivationCode()">Activate</button>
-        <button onclick="closeModals()" style="background:none; border:none; color:#94a3b8; cursor:pointer; margin-top: 25px;">Later</button>
-    </div>
-</div>
-
-<div id="biz-info-modal" class="modal-overlay">
-    <div class="modal-content">
-        <h2 style="margin-bottom: 15px;">Shop Details</h2>
-        <input type="text" id="bizNameInput" placeholder="Shop Name">
-        <input type="text" id="bizLocInput" placeholder="Location">
-        <button class="btn-main" onclick="saveBizInfo()">Save & Open</button>
-    </div>
-</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
-
-<script>
-    const firebaseConfig = { apiKey: "AIzaSyB-fZ2qA8aB_-Ra3I3WHa6RuoYFm-QabRY", authDomain: "click-cha.firebaseapp.com", databaseURL: "https://click-cha-default-rtdb.firebaseio.com", projectId: "click-cha", storageBucket: "click-cha.firebasestorage.app", messagingSenderId: "231261928692", appId: "1:231261928692:web:76e53480670c49b40932a1" };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    let state = JSON.parse(localStorage.getItem('spendy_v28')) || { pData: [], bData: [], pBudget: 0, bCats: ['Staff', 'Porter', 'Stock'], pCats: ['Food', 'Travel', 'Rent'], isPro: false, bizName: '', bizLoc: '' };
-    let mode = 'personal', selectedCat = 'Other', chart = null;
-
-    setTimeout(function() { 
-        document.getElementById('splash').style.opacity = '0'; 
-        setTimeout(function() { document.getElementById('splash').style.display = 'none'; document.getElementById('wrapper').style.display = 'block'; }, 600);
-    }, 1500);
-
-    function triggerBizMode() {
-        if (state.isPro) { if(!state.bizName) openBizInfoModal(); else startApp('business'); }
-        else document.getElementById('payment-modal').style.display = 'flex';
-    }
-
-    function openBizInfoModal() { document.getElementById('biz-info-modal').style.display = 'flex'; }
-    function saveBizInfo() {
-        state.bizName = document.getElementById('bizNameInput').value.trim() || 'My Business';
-        state.bizLoc = document.getElementById('bizLocInput').value.trim() || 'Gurugram';
-        save(); closeModals(); startApp('business');
-    }
-
-    function checkActivationCode() {
-        var key = document.getElementById('activationCode').value.trim();
-        if(!key) return;
-        var btn = document.getElementById('activate-btn'); btn.innerText = "Checking...";
-        db.ref('spendy_keys/' + key).once('value').then(function(snapshot) {
-            if (snapshot.val() === "USED") {
-                state.isPro = true; save();
-                Swal.fire('Unlocked!', 'Pro Mode Active', 'success').then(function() { closeModals(); triggerBizMode(); });
-            } else { Swal.fire('Error', 'Invalid Key!', 'error'); }
-            btn.innerText = "Activate";
-        });
-    }
-
-    function startApp(m) {
-        mode = m;
-        document.getElementById('home-page').style.display = 'none';
-        document.getElementById('main-app').style.display = 'block';
-        document.getElementById('universal-nav').style.display = 'flex';
-        var isB = (m === 'business');
-        document.getElementById('hero').style.background = isB ? 'var(--biz-panel)' : 'var(--pers-panel)';
-        document.getElementById('budget-ui').style.display = isB ? 'none' : 'block';
-        document.getElementById('biz-name-disp').innerText = isB ? state.bizName : 'SPENDY';
-        document.getElementById('biz-loc-disp').innerHTML = isB ? state.bizLoc + ' <i class="fa-solid fa-pen" onclick="openBizInfoModal()"></i>' : 'DASHBOARD';
-        document.getElementById('edit-biz-icon').style.display = isB ? 'inline-block' : 'none';
-        loadCategories(); refresh(); renderCalendar();
-    }
-
-    function loadCategories() {
-        var container = document.getElementById('category-list'); container.innerHTML = '';
-        var cats = mode === 'personal' ? state.pCats : state.bCats;
-        cats.forEach(function(c) {
-            var span = document.createElement('span');
-            span.className = 'chip'; span.innerText = c;
-            span.onclick = function() { selectedCat = c; document.querySelectorAll('.chip').forEach(function(x) { x.classList.remove('selected'); }); span.classList.add('selected'); };
-            container.appendChild(span);
-        });
-        var add = document.createElement('span'); add.className = 'chip'; add.innerHTML = '+';
-        add.onclick = function() {
-            Swal.fire({ title: 'New Category', input: 'text' }).then(function(res) {
-                if(res.value) { if(mode === 'personal') state.pCats.push(res.value); else state.bCats.push(res.value); save(); loadCategories(); }
-            });
-        };
-        container.appendChild(add);
-        selectedCat = 'Other';
-    }
-
-    function addEntry() {
-        var d = document.getElementById('desc').value, a = document.getElementById('amt').value;
-        if(!d || !a) return;
-        var target = mode === 'personal' ? 'pData' : 'bData';
-        state[target].push({ id: Date.now(), d: d, a: parseFloat(a), cat: selectedCat, dt: new Date().toLocaleDateString('en-IN') });
-        document.getElementById('desc').value = ''; document.getElementById('amt').value = '';
-        save(); refresh(); renderCalendar();
-    }
-
-    function deleteEntry(id) {
-        var target = mode === 'personal' ? 'pData' : 'bData';
-        state[target] = state[target].filter(function(i) { return i.id !== id; });
-        save(); refresh(); renderCalendar();
-    }
-
-    function refresh() {
-        var recent = document.getElementById('recent-list'), full = document.getElementById('full-list');
-        recent.innerHTML = ''; full.innerHTML = '';
-        var total = 0;
-        var data = mode === 'personal' ? state.pData : state.bData;
-        var today = new Date().toLocaleDateString('en-IN');
-        data.slice().reverse().forEach(function(i) {
-            total += i.a;
-            var row = '<div class="item-row"><div><b>' + i.d + '</b><br><small>' + i.dt + ' • ' + i.cat + '</small></div><div style="display:flex; align-items:center; gap:15px;"><div style="color:#eb4d4b; font-weight:800">₹' + i.a + '</div><button class="del-btn" onclick="deleteEntry(' + i.id + ')"><i class="fa-solid fa-trash-can"></i></button></div></div>';
-            full.innerHTML += row;
-            if(i.dt === today) recent.innerHTML += row;
-        });
-        document.getElementById('total-display').innerText = "₹" + (mode === 'personal' ? (state.pBudget - total) : total).toLocaleString();
-        updateChart(data);
-    }
-
-    function updateChart(data) {
-        var ctx = document.getElementById('spendChart').getContext('2d');
-        if(chart) chart.destroy();
-        var cats = {}; data.forEach(function(i) { cats[i.cat] = (cats[i.cat] || 0) + i.a; });
-        chart = new Chart(ctx, { 
-            type: 'doughnut', 
-            data: { labels: Object.keys(cats), datasets: [{ data: Object.values(cats), backgroundColor: ['#6c5ce7', '#00cec9', '#ff7675', '#fdcb6e', '#a29bfe'], borderWeight:0 }] }, 
-            options: { maintainAspectRatio: true, cutout:'70%', plugins:{ legend:{ display:false } } } 
-        });
-    }
-
-    function renderCalendar() {
-        var cal = document.getElementById('calendar'); cal.innerHTML = '';
-        var data = mode === 'personal' ? state.pData : state.bData;
-        var today = new Date();
-        for(var i=0; i<14; i++) {
-            var d = new Date(); d.setDate(today.getDate() - i);
-            var ds = d.toLocaleDateString('en-IN');
-            var dayTotal = data.filter(function(x) { return x.dt === ds; }).reduce(function(s, x) { return s + x.a; }, 0);
-            var div = document.createElement('div');
-            div.style = 'padding:10px 5px; background:' + (dayTotal > 0 ? '#e0e7ff':'#f9fafb') + '; border-radius:12px; text-align:center; font-size:10px; border: 1px solid ' + (dayTotal > 0 ? 'var(--primary)':'#eee');
-            div.innerHTML = '<b>' + d.getDate() + '</b><br>₹' + dayTotal;
-            cal.appendChild(div);
-        }
-    }
-
-    function exportToPDF() {
-        var jsPDF = window.jspdf.jsPDF; var doc = new jsPDF();
-        var data = mode === 'personal' ? state.pData : state.bData;
-        var title = mode === 'business' ? state.bizName.toUpperCase() : "PERSONAL WALLET";
-        doc.setFontSize(18); doc.text(title, 14, 20);
-        doc.setFontSize(10); doc.text((mode === 'business' ? state.bizLoc : '') + ' | Generated by Spendy', 14, 28);
-        var rows = data.map(function(i) { return [i.dt, i.cat, i.d, "Rs. " + i.a.toLocaleString()]; });
-        doc.autoTable({ head: [['Date', 'Category', 'Note', 'Amount']], body: rows, startY: 35, theme: 'grid', headStyles: { fillColor: [108, 92, 231] } });
-        var total = data.reduce(function(s, i) { return s + i.a; }, 0);
-        var finalY = doc.lastAutoTable.finalY + 10;
-        doc.text('GRAND TOTAL: Rs. ' + total.toLocaleString(), 14, finalY);
-        doc.text("POWERED BY SAARVAIN", 14, finalY + 10);
-        doc.save('Report.pdf');
-    }
-
-    function toggleMenu() { document.getElementById('side-menu').classList.toggle('open'); document.getElementById('menu-overlay').style.display = document.getElementById('side-menu').classList.contains('open') ? 'block' : 'none'; }
-    function closeModals() { document.querySelectorAll('.modal-overlay').forEach(function(m) { m.style.display = 'none'; }); }
-    function save() { localStorage.setItem('spendy_v28', JSON.stringify(state)); }
-    function showSec(id, el) { document.querySelectorAll('.app-section').forEach(function(s) { s.classList.remove('active'); }); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); }); el.classList.add('active'); }
-    function switchModePrompt() { var n = mode === 'personal' ? 'business' : 'personal'; if(n === 'business') triggerBizMode(); else startApp(n); }
-    function saveBudget() { state.pBudget = parseFloat(document.getElementById('budgetInput').value) || 0; save(); refresh(); }
-    function resetData() { Swal.fire({ title: 'Clear History?', icon: 'warning', showCancelButton: true }).then(function(r) { if(r.isConfirmed) { if(mode === 'personal') state.pData = []; else state.bData = []; save(); refresh(); renderCalendar(); } }); }
-    function sendFeedback() { var m = document.getElementById('feedbackMsg').value; if(!m) return; var f = new FormData(); f.append('app', 'Spendy'); f.append('message', m); fetch('https://script.google.com/macros/s/AKfycbz3wk6iVLZV8HqYHBdlUD39uj7YgLPBoOwmaBT6TL29VpCXlTCL7KN_eRgMAPtAc6oO/exec', { method: 'POST', body: f }).then(function() { Swal.fire('Sent!', 'Thanks!', 'success'); document.getElementById('feedbackMsg').value = ''; toggleMenu(); }); }
-</script>
-
+    <!-- External Script Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    
+    <!-- Core Application Logic -->
+    <script src="app.js"></script>
 </body>
 </html>
