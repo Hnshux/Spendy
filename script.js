@@ -2,6 +2,7 @@
 const SpendyNotify = {
     show(msg, type = 'info', duration = 3000) {
         const container = document.getElementById('custom-toast-container');
+        if (!container) return;
         const toast = document.createElement('div');
         toast.className = `custom-toast ${type}`;
         
@@ -21,6 +22,7 @@ const SpendyNotify = {
     },
     confirm(msg, onConfirm) {
         const container = document.getElementById('custom-toast-container');
+        if (!container) return;
         const box = document.createElement('div');
         box.className = 'custom-toast confirm-box';
         box.innerHTML = `
@@ -39,32 +41,42 @@ const SpendyNotify = {
     }
 };
 
-// Database Architecture Config
-const firebaseConfig = { 
-    apiKey: "AIzaSyB-fZ2qA8aB_-Ra3I3WHa6RuoYFm-QabRY", 
-    authDomain: "click-cha.firebaseapp.com", 
-    databaseURL: "https://click-cha-default-rtdb.firebaseio.com", 
-    projectId: "click-cha", 
-    storageBucket: "click-cha.firebasestorage.app", 
-    messagingSenderId: "231261928692", 
-    appId: "1:231261928692:web:76e53480670c49b40932a1" 
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
+// Application State Layer
 let state = JSON.parse(localStorage.getItem('spendy_v28')) || { pData: [], bData: [], pBudget: 0, bCats: ['Staff', 'Porter', 'Stock'], pCats: ['Food', 'Travel', 'Rent'], isPro: false, bizName: '', bizLoc: '' };
-let mode = 'personal', selectedCat = 'Other', chart = null;
+let mode = 'personal', selectedCat = 'Other', chart = null, db = null;
 
-// Handle Splash Visibility Switch
-window.addEventListener('DOMContentLoaded', () => {
+// Firebase Architecture Config (Safe Initialization Check)
+try {
+    if (typeof firebase !== 'undefined') {
+        const firebaseConfig = { 
+            apiKey: "AIzaSyB-fZ2qA8aB_-Ra3I3WHa6RuoYFm-QabRY", 
+            authDomain: "click-cha.firebaseapp.com", 
+            databaseURL: "https://click-cha-default-rtdb.firebaseio.com", 
+            projectId: "click-cha", 
+            storageBucket: "click-cha.firebasestorage.app", 
+            messagingSenderId: "231261928692", 
+            appId: "1:231261928692:web:76e53480670c49b40932a1" 
+        };
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.database();
+    }
+} catch (e) {
+    console.warn("Firebase initialization skipped or deferred:", e);
+}
+
+// Window Event Router for Safe DOM Execution
+window.addEventListener('load', () => {
     setTimeout(function() { 
         const splash = document.getElementById('splash');
-        splash.style.opacity = '0'; 
-        setTimeout(function() { 
-            splash.style.display = 'none'; 
-            document.getElementById('wrapper').style.display = 'block'; 
-        }, 400);
-    }, 1200);
+        if (splash) {
+            splash.style.opacity = '0'; 
+            setTimeout(function() { 
+                splash.style.display = 'none'; 
+                const wrapper = document.getElementById('wrapper');
+                if (wrapper) wrapper.style.display = 'block'; 
+            }, 400);
+        }
+    }, 1000);
 });
 
 function triggerBizMode() {
@@ -87,6 +99,10 @@ function saveBizInfo() {
 function checkActivationCode() {
     var key = document.getElementById('activationCode').value.trim();
     if(!key) return;
+    if(!db) {
+        SpendyNotify.show('Database network offline. Try again.', 'error');
+        return;
+    }
     var btn = document.getElementById('activate-btn'); btn.innerText = "Validating...";
     db.ref('spendy_keys/' + key).once('value').then(function(snapshot) {
         if (snapshot.val() === "USED") {
@@ -96,6 +112,9 @@ function checkActivationCode() {
         } else { 
             SpendyNotify.show('Invalid Activation License Key', 'error');
         }
+        btn.innerText = "Activate License";
+    }).catch(() => {
+        SpendyNotify.show('Verification failed', 'error');
         btn.innerText = "Activate License";
     });
 }
@@ -185,6 +204,7 @@ function deleteEntry(id) {
 
 function refresh() {
     var recent = document.getElementById('recent-list'), full = document.getElementById('full-list');
+    if (!recent || !full) return;
     recent.innerHTML = ''; full.innerHTML = '';
     var total = 0;
     var data = mode === 'personal' ? state.pData : state.bData;
@@ -207,7 +227,9 @@ function refresh() {
 }
 
 function updateChart(data) {
-    var ctx = document.getElementById('spendChart').getContext('2d');
+    var chartCanvas = document.getElementById('spendChart');
+    if(!chartCanvas || typeof Chart === 'undefined') return;
+    var ctx = chartCanvas.getContext('2d');
     if(chart) chart.destroy();
     
     var cats = {}; data.forEach(function(i) { cats[i.cat] = (cats[i.cat] || 0) + i.a; });
@@ -229,7 +251,9 @@ function updateChart(data) {
 }
 
 function renderCalendar() {
-    var cal = document.getElementById('calendar'); cal.innerHTML = '';
+    var cal = document.getElementById('calendar'); 
+    if(!cal) return;
+    cal.innerHTML = '';
     var data = mode === 'personal' ? state.pData : state.bData;
     var today = new Date();
     for(var i=0; i<14; i++) {
@@ -244,6 +268,10 @@ function renderCalendar() {
 }
 
 function exportToPDF() {
+    if(typeof window.jspdf === 'undefined') {
+        SpendyNotify.show('PDF Library not loaded completely', 'error');
+        return;
+    }
     var jsPDF = window.jspdf.jsPDF; var doc = new jsPDF();
     var data = mode === 'personal' ? state.pData : state.bData;
     var title = mode === 'business' ? state.bizName.toUpperCase() : "BALANCE LEDGER STATEMENT";
@@ -289,5 +317,7 @@ function sendFeedback() {
     .then(function() { 
         SpendyNotify.show('Feedback Transmitted!', 'success');
         document.getElementById('feedbackMsg').value = ''; toggleMenu(); 
-    }); 
+    }).catch(() => {
+        SpendyNotify.show('Feedback failed to send', 'error');
+    });
 }
